@@ -7,4 +7,58 @@
 4. Once the dependencies are installed, run `npm start` to start the server.
 
 ## Using the GUI Command Center
-The GUI uses an electron app - that means you can't use
+to-do
+
+## API Endpoints
+All `POST` endpoints take in JSON data. All endpoints, `GET` or `POST`, output in JSON unless specified.
+
+### `POST /api/v1/student/authenticate`
+Gets an access token for a student.
+
+Request body:
+```json
+{
+  "email_address": "student@your.school.edu",
+  "student_key": "<insert student key here>"
+}
+```
+
+Response body:
+```json
+{
+  "success": true,
+  "access_token": "b88da0f3a7c7edd69d90e7ab2e7fb3"
+}
+```
+
+> Warning: a student key is like a password - it prevents others from impersonating your students - keep it safe!
+
+### `POST /api/v1/admin/authenticate`
+Gets an access token for a system administrator.
+
+Request body:
+```json
+{
+  "email_address": "the.admin@urschoolteachers.com",
+  "admin_key": "<insert admin key here>"
+}
+```
+
+Response body:
+```json
+{
+  "success": true,
+  "access_token": "b88da0f3a7c7edd69d90e7ab2e7fb3"
+}
+```
+
+> Warning: an admin key is more important to protect than a student key - Staff Keys give access to teacher and even administrator accounts!
+
+### `POST /api/v1/admin/add-student`
+Adds a student to the system - meant for automation.
+
+Request body:
+```json
+{
+   "access_token": "b88da0f3a7c7edd69d90e7ab2e7fb3",
+   "email_address": "the.admin@urschoolteachers.com",
