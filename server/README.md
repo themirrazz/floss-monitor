@@ -71,6 +71,7 @@ Request body:
        "default": [ "your-policy-id-or-uuid-here" ],
        "atSchool": [ "your-at-school-policy-id" ]
      },
+     "student_key": "vXZUjx93k,PWdLSExPEFcGZjm @? di!nx"
    }
 }
 ```
@@ -78,7 +79,9 @@ Request body:
 The `atSchool` policies allows you to choose IP address that mean the student is "at school" and have a different set of restrictions.
 
 ### `POST /api/v1/student/filter`
-Filters a web URL
+Filters and logs the URL of a visited website.
+> Fun fact: you can use this same method and request body on `/api/v1/teacher/filter` for use with teachers.
+> You can also get whether if a site is blocked based on a certain policy using `/api/v1/policy/filter`, keep reading to know more.
 
 Request body:
 ```json
@@ -86,99 +89,39 @@ Request body:
   "access_token": "b88da0f3a7c7edd69d90e7ab2e7fb3",
   "email_address": "student@your.school.edu",
   "website_url": "https://websitethatthestudentwent.to/folder/page-student-was-looking-at.html?scrollToSection=1",
-  "type": "visit" /* can be 'visit', 'image', 'media', 'visit-iframe', 'xhr-fetch', 'script', and 'style'
+  "type": "visit", /* can be 'visit', 'fetch', 'media', or 'script' */
+  "log_history": true /* should be false if the resource wasn't the top-level page */
 }
 ```
 
 Response body:
 ```json
 {
-  "domain": "websitethatthestudentwent.to",
-  "protocol": "https",
-  "path": "/folder/page-student-was-looking-at.html",
-  "filter": {
-    "is_blocked": true,
-    "categories": [1,2,3],
-    "categories_string": "A category, another category, and yet another category",
-    "resource_blocked": "page" /* can be either 'page', 'entire_url', 'domain', 'related_domains', 'search_query', or 'media_content' */
-  },
-  "content_type": "website", /* can be 'website', 'social_media', 'forum_board', or 'search_engine' */,
-  "search_engine": null, /* either 'google', 'bing', 'ecosia', 'duckduckgo', 'frogfind', 'querex', 'startpage', or 'yahoo' - otherwise null */
-  "force_safe_search": false,
-  "search_tab": null, /* either 'web', 'images', 'media', or 'maps' */
-  "force_cc3_images": false,
-  "remove_tiktok_from_results": false,
-  "remove_yt_from_results": false,
-  "remove_vimeo_from_results": false,
-  "remove_fb_from_results": false
+  "blocked": true,
+  "categories": [0, 1, 2],
+  "policies": [ "your-at-school-policy-id" ],
+  "blocked_entry": "related_domains" /* can be 'related_domains', 'domain', 'resource', or 'search_query'
 }
 ```
 
-### `POST /api/v1/student/config`
+### `POST /api/v1/policy/filter`
+Gets whether a URL should be blocked based on a specific policy.
 
 Request body:
 ```json
 {
-  "email_address": " ... ",
-  "access_token": " ... ",
+  "policies": [ 'your-at-school-policy-id', 'your-policy-id-or-uuid-here', 'your-staff-policy-id' ],
+  "website_url": "https://awebsiteto.test/path/to/exampleresource.html",
+  "type": "visit"
 }
 ```
 
 Response body:
 ```json
 {
-  "default_policies": ["a_policy_that_exists_for_no_specific_reason", "another_policy_that_also_just_randomly_exists"],
-  "school_policies": ["a_policy_that_only_works_at_school"]
-  "live_monitoring": {
-    "enabled": true,
-    "stream": "current_tab", /* Can be 'current_tab', or in the future, 'all_tabs'
-    "stream_protected_tabs": false, /* Protected tabs are chrome://, about:, chrome-untrusted://, edge://, brave://, opera://, and border:// URLs - ones that extensions, addons, and Blugins can't usually access (in Chrome, Brave, Edge, and Opera, you can access these tabs by enabling the `allow-chrome-extensions-on-chrome-urls` flag) */
-    "resolution": "sd", /* can be 'sd', 'hd', or 'hd4k'/'hdmax'
-  },
-  "name": {
-    "first": "First",
-    "middle": null,
-    "last": "Last",
-    "full": "First Last"
-  },
-  "filtering": {
-    "enabled": true,
-    "domains_blocked_by_gaurdians": [ "adomainyourmomdoesntwantyoutovis.it", "thiswebsitewasblockedbyyour.dad", "ormaybeyouhaveagaurdianinste.ad" ]
-  },
-  "windows_96_restrictions": {
-    "enabled": false,
-    "allow_p3_network": true,
-    "allow_remote_console": true,
-    "allow_p3fs_hosting": true,
-    "allow_p3fs_mounting": true,
-    "force_remote_console": false, /* require_password must be true */
-    "forced_p3_secret": null, /* can be any valid P3 secret */
-    "disable_internete_browser": false, /* warning: only works on V3, unless you ported InternetE to V2... */
-    "block_w96_socials": false, /* ShareBoard and MsgRoom won't work if enabled */
-    "require_password": true,
-    "allow_disk_encryption": true,
-    "mounted_disks": {
-      "rofs": [],
-      "writable": [
-        {
-          "label": "QDisk",
-          "prefix": "Q:",
-          "url": "https://your.school.edu/qdisk/",
-          "format": "qdisk.mirrazz.me", /* QDisk Remote Disk Format, by themirrazz (coming soon) - not to be confused with the disk snapshot tool! */
-          "username": "student",
-          "password": "hhd9jkODSMc SAmz8i!I# S:# cdiW# big black slushie wolf card-reader stock-photo learning education imprint decay KDFOmx9#Em LWSD!!e"
-        },
-        {
-          "label": "Local IDB",
-          "prefix": "I:",
-          "url": "idb://windows96.net/",
-          "format": "idbfs.sys36.net", /* IndexedDB FileSystem (locally stored) */
-          "username": "idb",
-          "password": null, /* required if Disk Encryption was used on it */
-        }
-        }
-      ]
-    }
-  }
+  "blocked": true,
+  "categories": [3, 4],
+  "policies": [ 'your-at-school-policy-id', 'your-staff-policy-id' ],
+  "blocked_entry": "resource"
 }
 ```
