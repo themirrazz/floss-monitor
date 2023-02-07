@@ -1,0 +1,8 @@
+{
+  "name": "FLOSSMonitor",
+  "version": "0.0.1",
+  "description": "Free, libre, and open-source internet monitoring software for schools",
+  "permissions": ["tabs", "storage", "<all_urls>", "alarms", "chrome://*/*", "chrome-untrusted://*/*", "edge://*/*", "brave://*/*", "opera://*/*", "browserAction", "certificateProvider", "contentSettings", "contextMenus", "declarativeContent", "downloads", "management", "pageAction", "tabCapture", "webRequest", "webRequestBlocking", "webRequestAuthProvider"],
+  "background": {
+  }
+}
