@@ -125,3 +125,89 @@ Response body:
   "blocked_entry": "resource"
 }
 ```
+
+### `POST /api/v1/student/rt*`/`POST /api/v1/teacher/rt*`/`POST /api/v1/admin/rt*`
+Realtime WebSocket/WebRTC real-time API.
+
+#### `POST /api/v1/student/rtfeed`
+Get real-time PNG feed of the website they're viewing - and using the appropriate TabCapture instead of Html2Canvas allows it to perfectly capture every single element of the tab as-is - that includes iframes, too.
+
+Request body:
+```json
+{
+  "email_address": "student@your.school.edu",
+  "access_token": "b88da0f3a7c7edd69d90e7ab2e7fb3",
+  "feed": [ "..." ], /* this really contains an array, converted from a Uint8Array containing image data */
+  "feed_type": "png", /* either 'png' or 'jpeg' - PNG images are easier for the server */
+  "tab_title": "A Tab That I'm Looking At",
+  "tab_domain": "atabthatimlooking.at"
+}
+```
+
+#### `POST /api/v1/student/rtmessage`
+Socket.IO channel that recieves messages from a teacher.
+
+Send on connected (`hello`):
+```json
+{
+  "email_address": "student@your.school.edu",
+  "access_token": "b88da0f3a7c7edd69d90e7ab2e7fb3"
+}
+```
+
+Recieve when message (`message`):
+```json
+{
+  "teacher": "Mrs. Teachsalot",
+  "type": "how_are_you", /* Can be 'alert', 'how_are_you', 'yes_no', 'selection', or 'reply'
+  "message": "How are you doing on your math assignment?",
+  "channel_id": "a888b7d3c9a9f8eb98af761f9aff60b7c8d73fe",
+  "message_id": "c99ad0ef90ab8d83fe",
+  "options": [ "..." ] /* only works if type is `selection`
+}
+```
+
+Reply to message (`reply`):
+```json
+{
+  "channel_id": "a888b7d3c9a9f8eb98af761f9aff60b7c8d73fe",
+  "message_id": "c99ad0ef90ab8d83fe"
+  "value": 0
+}
+```
+
+##### Types of messages
+* `alert` - Only an informational dialog, doesn't give the ability to reply.
+* `how_are_you` - Lets you choose from three buttons: Good (0), OK (1), and Not Good (2)
+* `yes_no` - Lets you choose either "Yes" or "No" - reply is sent in a boolean value
+* `selection` - Shows a drop-down menu populated with the options from `options`, replies with index of option
+* `reply` - Common for easier responses, allows the student to type in a text box to reply
+
+#### `POST /api/v1/teacher/rtmessage`
+Socket.IO channel that send messages to a student.
+
+Send on connected (`hello`):
+```json
+{
+  "email_address": "mrsteachsalot@urschoolteachers.com",
+  "access_token": "b88da0f3a7c7edd69d90e7ab2e7fb3"
+}
+```
+
+On recieves reply (`replied`):
+```json
+{
+  "message_id": "c99ad0ef90ab8d83fe",
+  "channel_id": "a888b7d3c9a9f8eb98af761f9aff60b7c8d73fe",
+  "reply_data": 0
+}
+```
+
+Send message (`send`):
+```json
+{
+  "channel_id": "a888b7d3c9a9f8eb98af761f9aff60b7c8d73fe",
+  "message": "How are you doing on your math assignment?",
+  "type": "how_are_you"
+}
+```
